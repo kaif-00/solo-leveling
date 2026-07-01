@@ -1,0 +1,5 @@
+.modd/
+.env
+__pycache__/
+*.pyc
+apii.py
