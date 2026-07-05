@@ -63,6 +63,9 @@ class moddle:
         with open('level.json','w') as f:
             json.dump(data,f)
 
+"""So if we want to add some functionality like it need conformation we will add it to while loop
+so it will re-prompt the same task again."""
+
 class functionality:
     def __init__(self):
         pass
@@ -98,10 +101,28 @@ class functionality:
                 else:
                     try:
                         while True:
-                            r = input('Did you complete the task or u want to quit: ')
-                            if r.lower() in ('quit','yes','no'):
-                                break
-                            print('Invalid responce\n')
+                            r = input('Did you complete the task or you want to quit or skip: ')
+                            if r.lower() not in ('quit','yes','no','skip'):
+                                print('Invalid responce\n')
+                                continue
+
+                            if r.lower() == 'skip':
+                                try:
+                                    with open('xp.txt', 'r') as f:
+                                        content = int(f.read())
+                                except FileNotFoundError:
+                                    content = 0
+
+                                if content < 20:
+                                    print(f'Not enough XP to skip. You need 20 but have {content}.')
+                                    continue
+                                else:
+                                    skip_point = content - 20
+                                    print(f'Skipped Total XP: {skip_point}')
+                                    with open('xp.txt', 'w') as f:
+                                        f.write(str(skip_point))
+                                    break
+                    
                         if 'quit' == r.lower():
                             return
                         
