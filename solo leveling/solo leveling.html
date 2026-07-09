@@ -7,32 +7,32 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <video autoplay muted loop class="bg-video">
+        <source src="solo_1.mp4" type="video/mp4">
+    </video>
     <nav class="navigation">
-        <p class="solo_leveling">Solo Leveling System</p>
-        <!-- <a href=" " class="login">Login</a>
-        <a href=" " class="about">About us</a>
-        <a href=" " class="contact">Contact us</a> -->
-        
-            <div class="hamburger" onclick="toggleMenu()">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-        <div class="nav-links" id="navLinks">
-            <a href=" " class="nav-link">Login</a>
-            <a href=" " class="nav-link">About us</a>
-            <a href=" " class="nav-link">Contact us</a>
-        </div>
+        <p class="solo_leveling">Solo Leveling</p>
+        <a href=" " class="nav-link">Login</a>
+        <a href=" " class="nav-link">About us</a>
+        <a href=" " class="nav-link">Contact us</a>
     </nav>
-    <div class="box">
-        <a href=" " class="start">Start new goal</a><br><br>
-        <a href=" " class="old">Continue with old</a>
+
+    <div class="ditbox">
+        <div class="detail">
+            <h1>Solo Leveling System</h1>
+            <h2>Arise, Hunters</h2>
+            <p>The system has chosen you. Turn your goals into quests <br>
+            earn XP points, and level up your real life.</p>
+        </div>
     </div>
-    <script>
-        function toggleMenu() {
-            const navLinks = document.getElementById('navLinks');
-            navLinks.classList.toggle('active');
-        }
-    </script>
+
+    <div class="b">
+        <div class="box">
+            <a href="new_goal.html" class="start">Start new goal</a>
+            <a href=" " class="start">Continue with old</a>
+        </div>
+    </div>
+
+
 </body>
 </html>

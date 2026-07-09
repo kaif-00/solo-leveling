@@ -6,94 +6,139 @@
 
 body{
     background-image: url("solo.jpg");
-    background-position: center;
     background-repeat: no-repeat;
-    background-size: cover;
     background-attachment: fixed;
+    background-position: center;
+    background-size: cover;
 }
+
+.bg-video{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+}
+
 .navigation{
-    background: linear-gradient(to left,rgba(0, 0, 0, 0.534),rgba(76, 0, 255, 0.384));
+    background: linear-gradient(to bottom,rgba(0, 0, 0, 0.603),rgba(0, 132, 255, 0.384));
+    display: flex;
+    justify-content:center;
+    align-items: flex-end;
 }
+
+.nav-link{
+    /* display: flex; */
+    color: black;
+    margin: 10px;
+    text-decoration: none;
+}
+
 .solo_leveling{
-    /* background: linear-gradient(to left,rgba(0, 0, 0, 0.534),rgba(76, 0, 255, 0.384)); */
     font-family:'Courier New', Courier, monospace;
+    text-shadow: 2px 5px 5px rgb(0, 0, 0);
     color: aliceblue;
-    text-align: center;
+    /* text-align: left; */
     word-spacing: 5px;
     font-size: 30px;
     padding: 9px;
-    margin: 0px;
-}
-.login{
-    text-decoration: none;
-    color: rgb(255, 255, 255);
+    margin-right: auto;
 }
 
-.about{
-    text-decoration: none;
-    color: rgb(255, 255, 255);
+
+.b{
+    display: flex;
+    justify-content:end;
+    align-items: flex-end;
+    padding-top: 20px;
+    padding-right: 500px;
 }
 
-.contact{
-    text-decoration: none;
-    color: rgb(255, 255, 255);
-}
 
 .box{
-    background: linear-gradient(to left,rgb(27, 27, 27),rgba(0, 132, 255, 0.596));
-    /* background-position: 100px; */
-    border-radius: 20px;
-    margin: 250px 620px 00px;
-    padding:20px;
-    width: 350px;
-    height: 100px;
-    text-align: center;
+    background: linear-gradient(to left,rgba(27, 27, 27, 0.699),rgba(0, 132, 255, 0.596));
     box-shadow: 10px 10px 19px rgb(0, 0, 0);
-    /* text-emphasis-position: 10000px; */
+    justify-content:center;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 20px;
+    text-align: center;
+    display: flex;
+    height: 170px;
+    padding:70px;
+    width: 350px;
+    gap: 10px;
 }
+
 
 .start{
-    text-decoration: none;
+    /* display: inline-block; */
+    background-color: rgba(40, 62, 255, 0.507);
+    /* transition: all 1s ease; */
+    box-shadow: 10px 10px 19px rgb(0, 0, 0);
     color: rgb(255, 255, 255);
+    text-decoration: none;
+    border-radius: 20px;
+    /* padding: 10px; */
+    margin: 5px;
+    padding: 10px 20px;
+    transition: all 0.3s ease;
+    /* width: 10px; */
+    /* height: 100px; */
 }
 
-.old{
-    text-decoration: none;
-    color: rgb(255, 255, 255);
+
+.start:hover{
+    background: linear-gradient(to bottom,rgba(0, 0, 255, 0.719),rgba(13, 13, 46, 0.589));
+    /* width: 220px; */
+    padding: 15px 20px;
 }
 
-
-.hamburger {
-    cursor: pointer;
+.ditbox{
+    /* filter: blur(4px); */
     display: flex;
+    justify-content: left;
+    align-items: center; 
+    padding-top: 22px;
+
+}
+.detail{
+    background: linear-gradient(to right,rgba(0, 132, 255, 0.014),rgba(0, 0, 0, 0.137));
+    border-radius: 20px;
+    
+    display: flex;
+    justify-content: left;
+    align-items:baseline;
     flex-direction: column;
-    gap: 5px;
-    width: fit-content;
-    margin: right; /* pushes it to the right */
-    padding: 5px;
+    height: 350px;
+    width: 700px;
+    gap: 30px;
+    transition: all 0.5s ease-in;
+    /* backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px); */
+} 
+
+.detail:hover{
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
-.hamburger span {
-    display: block;
-    width: 2px;
-    height: 3px;
-    background-color: white;
-    border-radius: 3px;
+.detail h2{
+    background-color: aliceblue;
+    color: black;
+    position: relative;
+    transition: all 0.2s ease;
+    /* top: 100px; */
 }
 
-.nav-links {
-    display: none; /* hidden by default */
-    flex-direction: column;
-    gap: 10px;
-    padding: 10px 0;
+.detail h2:hover{
+    background-color: black;
+    color: aliceblue;
 }
 
-.nav-links.active {
-    display: flex; /* shows when active class is added */
+.detail p{
+    color: aliceblue;
 }
 
-.nav-link {
-    text-decoration: none;
-    color: rgb(255, 255, 255);
-    padding: 5px;
-}
