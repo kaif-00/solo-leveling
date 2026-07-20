@@ -44,8 +44,7 @@ body{
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 9%;
-    padding-left: 20%;
+    margin: 100px;
 }
 
 .hint{
@@ -72,8 +71,6 @@ body{
     justify-content: center;
     align-items: center;
     padding-top: 10px;
-    padding-right: 0%;
-    padding-left: 10%;
 }
 
 .Input{
@@ -88,5 +85,21 @@ body{
     color: rgb(212, 234, 255);
     text-shadow: 10px 10px 19px rgb(0, 0, 0);
     border-radius: 20px;
-    padding: 4%;
+    padding: 40px;
+}
+
+@media (max-width: 480px){
+    .solo_leveling{
+        font-size: 20px;
+    }
+    .hintbox{
+        margin: 50px;
+    }
+    .hint{
+        font-size: 10px;
+    }
+
+    .box{
+        margin: 140px;
+    }
 }

@@ -4,14 +4,6 @@
     box-sizing: border-box;
 }
 
-/* body{
-    background-image: url("solo.jpg");
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-position: center;
-    background-size: cover;
-} */
-
 .bg-video{
     position: fixed;
     top: 0;
@@ -28,8 +20,9 @@
     top: 0;
     display: flex;
     justify-content:center;
-    align-items: flex-end;
+    align-items: center;
     flex-wrap: wrap;
+    padding: 5px 10px;
 }
 
 .nav-link{
@@ -53,9 +46,11 @@
 
 .b{
     display: flex;
-    justify-content:end;
-    align-items: flex-end;
-    padding-right: 30%;
+    justify-content:center;
+    align-items: center;
+    flex: 1;
+    min-width: 280px;
+    padding: 20px;
 }
 
 
@@ -68,15 +63,16 @@
     flex-direction: column;
     border-radius: 20px;
     text-align: center;
-    height: 170px;
-    padding:70px;
-    width: 40%;
-    gap: 20%;
+    padding:40px 30px;
+    gap: 22%;
+    width: 30%;
+    transition: all 1s ease;
 }
 
 
 .start{
     background-color: rgba(40, 62, 255, 0.507);
+    font-size: 90%;
     box-shadow: 10px 10px 19px rgb(0, 0, 0);
     color: rgb(255, 255, 255);
     text-decoration: none;
@@ -106,11 +102,9 @@
     justify-content: left;
     align-items:baseline;
     flex-direction: column;
-    overflow: auto;
-    padding: 5px;
-    height: 100%;
-    max-height: 250px;
-    width: 42%;
+    padding: 2px;
+    width: 90%; /*this will set the width and affect when screen size get smaller */
+    max-width: 400px; /*this is the maximum size of the width*/
     gap: 30px;
     transition: all 0.5s ease-in;
 } 
@@ -148,4 +142,46 @@
 .web_dit:hover{
     border: 2px solid rgba(255, 255, 255, 0.315);
     border-radius: 10px;
+}
+
+
+@media (max-width: 480px){
+
+    .bg-video{
+        object-position: 60% center;
+    }
+
+    .solo_leveling{
+        font-size: 20px;
+    }
+
+    .ditbox{
+        padding-top: 44px;
+    }
+
+    .detail{
+        font-size: 16px;
+        backdrop-filter: blur(10px);
+    }
+
+    .detail:hover{
+        transition: all 0.2s ease;
+        backdrop-filter: blur(0px);
+    }
+
+    .b{
+        padding-top: 30px;
+    }
+
+    .web_dit{
+        font-size: 10px;
+    }
+}
+
+
+@media (max-width: 760px){
+    .box{
+        transition: all 0.5s ease;
+        width: 100%;
+    }
 }

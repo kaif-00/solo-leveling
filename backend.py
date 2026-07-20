@@ -2,6 +2,7 @@ from flask import Flask, request, render_template, redirect,url_for
 from dotenv import load_dotenv
 from openai import OpenAI
 from ollama import chat
+from pyngrok import ngrok,conf
 import json
 import os
 
@@ -76,9 +77,13 @@ def new_goal():
 
 
 def dataa():
-    with open('level.json','r') as f:
-        data=json.load(f)
-    return data
+    try:
+        with open('level.json','r') as f:
+            content = json.load(f)
+        return content
+    except FileNotFoundError:
+        return []
+    
 
 
 @backend.route('/show_task',methods=['GET','POST'])
@@ -90,6 +95,7 @@ def show_task():
     pending = pending_data()
 
     pending_names = [task["task_name"] for task in pending]
+
 
     if request.method == 'POST':
         action = request.form.get('action')
@@ -169,27 +175,31 @@ def show_task():
     levels = None
     tasks = None
     difficultys = None
-    for lvl in data["levels"]:
-        for t in lvl["tasks"]:
-            if (t["task_name"] not in completes and
-                t["task_name"] not in pending_names and 
-                t["task_name"] not in skips):
-                levels = lvl
-                tasks = t
-                difficultys = t['difficulty']
-                break
 
-        if tasks:
-            break
+    if data is None:
+        return redirect(url_for('new_goal'))
     else:
-        files = ['complete.txt','skip.txt','level.json']
+        for lvl in data["levels"]:
+            for t in lvl["tasks"]:
+                if (t["task_name"] not in completes and
+                    t["task_name"] not in pending_names and 
+                    t["task_name"] not in skips):
+                    levels = lvl
+                    tasks = t
+                    difficultys = t['difficulty']
+                    break
 
-        for i in files:
-            try:
-                os.remove(i)
-            except FileNotFoundError:
-                pass
-        return render_template('final.html')
+            if tasks:
+                break
+        else:
+            files = ['complete.txt','skip.txt','level.json']
+
+            for i in files:
+                try:
+                    os.remove(i)
+                except FileNotFoundError:
+                    pass
+            return render_template('final.html')
 
     return render_template(
     "show_task.html",
@@ -209,22 +219,16 @@ def pending_data():
 def pending_complete():
         try:
             with open('pending_complete.txt','r') as f:
-                content = f.read().strip()
-                if content:
-                    return json.loads(content)
-                else:
-                    return []
+                content = json.load(f)
+            return content
         except FileNotFoundError:
             return []
 
 def pending_skip():
     try:
         with open('pending_skip.txt','r') as f:
-            content = f.read().strip()
-            if content:
-                return json.loads(content)
-            else:
-                return []
+                content = json.load(f)
+        return content
     except FileNotFoundError:
         return []
         
@@ -307,23 +311,33 @@ def pending_task():
 
 
 def complete():
-        try:
-            with open('complete.txt','r') as f:
-                content = f.read().strip()
-                if content:
-                    return json.loads(content)
-                else:
-                    return []
-        except FileNotFoundError:
-            return []
-
+    try:
+        with open('complete.txt','r') as f:
+            content = json.load(f)
+        return content
+    except FileNotFoundError:
+        return []
 def skip():
         try:
             with open('skip.txt','r') as f:
-                content = f.read().strip()
-                if content:
-                    return json.loads(content)
-                else:
-                    return []
+                content = json.load(f)
+            return content
         except FileNotFoundError:
             return []
+
+conf.get_default().auth_token='3Ga0kzoko9TRMvUZOzCWgV9iiNz_51DugyUD4sDdCzxrRJFcd'
+
+tunnels = ngrok.get_tunnels()
+print(f'Active tunnels: {tunnels}')
+for tunnel in tunnels:
+    print(f'Closing: {tunnel.public_url}')
+    ngrok.disconnect(tunnel.public_url)
+
+ngrok.kill()
+print('All tunnels closed')
+if __name__ == '__main__':
+    if os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
+        public_url = ngrok.connect(5000)
+        print(f'Open this on your phone: {public_url}')
+    
+    backend.run(debug=True, port=5000)

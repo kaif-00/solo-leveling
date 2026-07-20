@@ -7,6 +7,13 @@
     <title>Tasks</title>
 </head>
 <body>
+
+    <nav class="navigation">
+        <p class="solo_leveling">Solo Leveling</p>
+        <a href=" " class="nav-link">About me</a>
+    </nav>
+
+    
     <div class="container">
         <div class="card">
 
@@ -19,29 +26,29 @@
             <h2>{{ tasks["task_name"] }}</h2>
             <p>Difficulty: {{ tasks["difficulty"] }}</p>
             <p>Reward: {{ tasks["xp_reward"] }} XP</p>
+
+            <form method="POST">
+                <input
+                    type="hidden"
+                    name="task_name"
+                    value="{{ tasks['task_name'] }}">
+
+                <input
+                    type="hidden"
+                    name="xp_reward"
+                    value="{{ tasks['xp_reward'] }}">
+
+                <input
+                    type="hidden"
+                    name="difficulty"
+                    value="{{ tasks['difficulty'] }}">
+
+                <button name="action" value="yes">Complete</button>
+                <button name="action" value="no">Later</button>
+                <button name="action" value="skip">Skip (-20 XP)</button>
+            </form>
         </div>
     </div>
-
-        <form method="POST">
-            <input
-                type="hidden"
-                name="task_name"
-                value="{{ tasks['task_name'] }}">
-
-            <input
-                type="hidden"
-                name="xp_reward"
-                value="{{ tasks['xp_reward'] }}">
-
-            <input
-                type="hidden"
-                name="difficulty"
-                value="{{ tasks['difficulty'] }}">
-
-            <button name="action" value="yes">Complete</button>
-            <button name="action" value="no">Later</button>
-            <button name="action" value="skip">Skip (-20 XP)</button>
-        </form>
 
 </body>
 </html>
