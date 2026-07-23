@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect,url_for
+from flask import Flask, request, render_template, redirect,url_for,flash
 from dotenv import load_dotenv
 from openai import OpenAI
 from ollama import chat
@@ -7,7 +7,6 @@ import json
 import os
 
 backend = Flask(__name__)
-
 @backend.route('/',methods=['GET','POST'])
 def home():
     return render_template('solo leveling.html')
@@ -82,16 +81,31 @@ def dataa():
             content = json.load(f)
         return content
     except FileNotFoundError:
-        return []
+        return None
     
 
+def get_question_level():
+    try:
+        with open('question.txt','r') as f:
+            content = f.read().strip()
+            return json.loads(content) if content else []
+    except FileNotFoundError:
+        return []
 
+def write_question_level(lvl_num):
+    qust = get_question_level()
+    if lvl_num not in qust:
+        qust.append(lvl_num)
+    with open('question.txt','w') as f:
+        json.dump(qust,f)
+
+backend.secret_key = 'secret' 
 @backend.route('/show_task',methods=['GET','POST'])
 def show_task():
     data = dataa()
     completes = complete()
     skips = skip()
-
+    question_levels = get_question_level()
     pending = pending_data()
 
     pending_names = [task["task_name"] for task in pending]
@@ -175,22 +189,64 @@ def show_task():
     levels = None
     tasks = None
     difficultys = None
-
     if data is None:
+        flash('No goal selected')
         return redirect(url_for('new_goal'))
+    
     else:
         for lvl in data["levels"]:
-            for t in lvl["tasks"]:
-                if (t["task_name"] not in completes and
-                    t["task_name"] not in pending_names and 
-                    t["task_name"] not in skips):
-                    levels = lvl
-                    tasks = t
-                    difficultys = t['difficulty']
-                    break
+            lvl_tasks = lvl['tasks']
 
-            if tasks:
-                break
+            all_done = all(                     #so this checks if all tasks are completed
+                                                #if any task remain then the if condition fails and it goes 
+                t["task_name"] in completes or  #to the second loop and continue with task showing process
+                t["task_name"] in pending_names or #but if condition id true mean all task is completed for  
+                t["task_name"] in skips             #the level then it shows the question page 
+                for t in lvl_tasks
+            )
+
+            if not all_done:
+
+                for t in lvl["tasks"]:
+                    if (t["task_name"] not in completes and
+                        t["task_name"] not in pending_names and 
+                        t["task_name"] not in skips):
+                        levels = lvl
+                        tasks = t
+                        difficultys = t['difficulty']
+                        break
+
+                if tasks:
+                    break
+            else:
+                if lvl['level_number'] not in question_levels:
+                        api = os.getenv('API_KEY')
+                        client = OpenAI(
+                            api_key=api,
+                            base_url="https://api.groq.com/openai/v1",
+                        )
+
+                        response = client.chat.completions.create(
+                            model="llama-3.3-70b-versatile",
+                            messages=[{
+                                'role': 'system',
+                                'content': """You generate quiz questions. Output ONLY valid JSON, no markdown.
+                                Return exactly 3 questions as a simple list of strings.
+                                Example output: ["question 1", "question 2", "question 3"]
+                                STRICT: Output must be valid JSON only."""
+                            }, {
+                                'role': 'user',
+                                'content': f'Generate 3 quiz questions for this level: {lvl["level_name"]} - {lvl["description"]} - {lvl['tasks']}'
+                            }]
+                        )
+                        content = response.choices[0].message.content
+                        datas = json.loads(content)
+                        with open('question.json','w') as f:
+                            json.dump(datas,f)
+                        # current_lvl += 1
+                        return redirect(url_for('show_question'))
+                continue
+
         else:
             files = ['complete.txt','skip.txt','level.json']
 
@@ -201,12 +257,114 @@ def show_task():
                     pass
             return render_template('final.html')
 
-    return render_template(
-    "show_task.html",
-    levels=levels,
-    tasks=tasks,
-    difficulty = difficultys
-    )
+        return render_template(
+        "show_task.html",
+        levels=levels,
+        tasks=tasks,
+        difficulty = difficultys
+        )
+
+def answered_question():
+    try:
+        with open('answered.txt', 'r') as f:
+            content = f.read().strip()
+        return json.loads(content) if content else []
+    except FileNotFoundError:
+        return []
+
+def remove_file(files):
+    for f in files:
+        try:
+            os.remove(f)
+        except FileNotFoundError:
+            pass
+
+@backend.route('/question',methods=['GET','POST'])
+def show_question():
+    answered = answered_question()
+    if request.method == 'POST':
+        question = request.form.get('question')
+        answer = request.form.get('answer')
+        api = os.getenv('API_KEY')
+        client = OpenAI(
+            api_key=api,
+            base_url="https://api.groq.com/openai/v1",
+        )
+
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[{
+                'role': 'system',
+                'content': f"""Check this answer and give only a mark out of 100, no explanation.NO extra words only mark will be there
+                Question: {question}
+                Answer: {answer}"""
+            }]
+        )
+
+        content = response.choices[0].message.content
+        with open('mark.txt','w') as f:
+            f.write(str(content))
+
+        with open('mark.txt','r') as f:
+            mark = f.read()
+        
+        if int(mark) < 50:
+            data = dataa()
+            completes = complete()
+            question_levels = get_question_level()
+
+            if data:
+                for lvl in data['levels']:
+                    all_done = all(
+                        t['task_name'] in completes
+                        for t in lvl['tasks']
+                    )
+                    if all_done and lvl['level_number'] not in question_levels:
+                        for t in lvl['tasks']:
+                            if t['task_name'] in completes:
+                                completes.remove(t['task_name'])
+
+                            with open('complete.txt', 'w') as f:
+                                json.dump(completes,f)
+            file_name = ['answered.txt','question.json','mark.txt']
+            remove_file(file_name)
+            return redirect(url_for('show_task'))
+        
+        else:
+            answered.append(question)
+            with open('answered.txt', 'w') as f:
+                json.dump(answered, f)
+
+    with open('question.json','r') as f:
+        content = json.load(f)
+
+    question = None
+    for qust in list(content):
+        if qust not in answered:
+            question = qust
+            break
+    else:
+        datas = dataa()
+        completess = complete()
+        question_level = get_question_level()
+
+        if datas:
+            for lvl in datas['levels']:
+                all_done = all(t['task_name'] in completess 
+                               for t in lvl['tasks'])
+                if all_done and lvl['level_number'] not in question_level:
+                    for t in lvl['tasks']:
+                        write_question_level(lvl['level_number'])
+                        break
+        
+        files = ['mark.txt','answered.txt','question.json']
+        remove_file(files)
+        return redirect(url_for('show_task'))
+        
+    return render_template('question.html',
+                               question = question)
+
+
 
 def pending_data():
     try:
@@ -299,11 +457,7 @@ def pending_task():
             break
     else:
         files = ['pending_complete.txt','pending_skip.txt','pending.json']
-        for i in files:
-            try:
-                os.remove(i)
-            except FileNotFoundError:
-                pass
+        remove_file(files)
         return render_template('final.html')
     
     return render_template('pending_task.html',

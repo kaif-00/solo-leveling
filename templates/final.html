@@ -3,15 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='css/style6.css')}}">
+    <title>Finish</title>
 </head>
 <body>
 
     <nav class="navigation">
-        <p class="solo_leveling">Solo Leveling</p>
+        <a href = "{{ url_for('home') }}" class="solo_leveling">Solo Leveling</p>
         <a href=" " class="nav-link">About me</a>
     </nav>
-
-    <p>Thank you.</p>
+    
+    <div class="comp">
+        <div class="complete">
+            <p>You have completed all the tasks.</p>
+        </div>
+    </div>
 </body>
 </html>

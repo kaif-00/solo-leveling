@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/style7.css')}}">
+    <title>Qusetion</title>
+</head>
+<body>
+    <nav class="navigation">
+        <a href = "{{ url_for('home') }}" class="solo_leveling">Solo Leveling</p>
+        <a href=" " class="nav-link">About me</a>
+    </nav>
+    
+    <div class="quest">
+        <div class="question">
+            <p>{{ question }}</p>
+
+            <form class="Input" method="POST">
+                <input type="hidden" name="question" value="{{ question }}">
+                <label for="answer">Enter Answer:</label>
+                <input type="text" id="answer" name="answer" class="box" placeholder="Enter Answer">
+            </form>
+        </div>
+    </div>
+</body>
+</html>

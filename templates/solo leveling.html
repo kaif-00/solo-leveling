@@ -12,7 +12,7 @@
     </video>
 
     <nav class="navigation">
-        <p class="solo_leveling">Solo Leveling</p>
+        <a href = "{{ url_for('home') }}" class="solo_leveling">Solo Leveling</p>
         <a href=" " class="nav-link">About me</a>
     </nav>
 
@@ -34,7 +34,7 @@
     <div class="b">
         <div class="box">
             <a href="{{ url_for('new_goal') }}"class="start">New Goal</a>
-            <a href="{{ url_for('show_task') }} " class="start">Continue Goals</a>
+            <a href="{{ url_for('show_task') }} " class="start" id="continue">Continue Goals</a>
             <a href="{{ url_for('pending_task') }} " class="start">Pending Goals</a>
         </div>
     </div>

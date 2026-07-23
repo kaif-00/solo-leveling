@@ -41,20 +41,20 @@ body{
     margin-right: auto;
 }
 
-.container{
+.comp{
     display:flex;
     flex-wrap:wrap;
     justify-content:center;
-    margin: 150px;
+    margin-top: 200px;
 }
 
-.card{
+.complete{
     background:rgba(255,255,255,0.08);
     border:1px solid rgba(0,132,255,.4);
     box-shadow:0 0 25px rgba(0,132,255,.3);
     display: flex;
     justify-content: center;
-    flex-direction: column;
+    align-items: center;
     gap: 20px;
     width:350px;
     padding:20px;
@@ -68,11 +68,11 @@ body{
         font-size: 20px;
     }
     
-    .container{
+    .comp{
         padding-top: 120px;
         margin: 5px;
     }
-    .card{
+    .complete{
         width: 200%;
         max-width: 650px;
         font-size: 9px;
