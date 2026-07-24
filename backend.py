@@ -189,6 +189,7 @@ def show_task():
     levels = None
     tasks = None
     difficultys = None
+    resource = None
     if data is None:
         flash('No goal selected')
         return redirect(url_for('new_goal'))
@@ -196,6 +197,7 @@ def show_task():
     else:
         for lvl in data["levels"]:
             lvl_tasks = lvl['tasks']
+            resource = lvl['Learning_Resource']
 
             all_done = all(                     #so this checks if all tasks are completed
                                                 #if any task remain then the if condition fails and it goes 
@@ -259,6 +261,7 @@ def show_task():
 
         return render_template(
         "show_task.html",
+        Learning_Resource = resource,
         levels=levels,
         tasks=tasks,
         difficulty = difficultys
