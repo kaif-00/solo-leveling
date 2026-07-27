@@ -7,13 +7,21 @@
     <title>Tasks</title>
 </head>
 <body>
+    <video autoplay muted loop class="bg-video" preload="none">
+        <source src="{{ url_for('static', filename='video/solo leveling.mp4') }}" type="video/mp4">
+    </video>
 
     <nav class="navigation">
         <a href = "{{ url_for('home') }}" class="solo_leveling">Solo Leveling</p>
         <a href=" " class="nav-link">About me</a>
     </nav>
 
-
+    <div class="xpp">
+        <div>
+            <h2 class="xp">XP points: {{content}}</h2>
+        </div>
+    </div>
+    
     <div class="container">
         <div class="card">
 

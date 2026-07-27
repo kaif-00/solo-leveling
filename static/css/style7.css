@@ -57,12 +57,33 @@ body{
     align-items: center;
     flex-direction: column;
     gap: 20px;
-    width:350px;
+    width:450px;
     padding:20px;
     border-radius:20px;
     backdrop-filter:blur(12px);
 }
 
+.Input{
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+#answer{
+    flex: 1;
+    border: none;
+    outline: none;
+    resize: none;
+    overflow-y: auto;
+    border-radius:20px;
+    padding: 2px 6px 6px 6px;
+    /* background: transparent; */
+    background-color: rgb(96, 184, 255);
+    color: rgb(253, 254, 255);
+    font-size: 16px;
+    line-height: 1.5;
+    max-height: 200px;
+    width: 400px;
+}
 
 @media (max-width: 480px){
     .solo_leveling{
@@ -73,10 +94,28 @@ body{
         padding-top: 120px;
         margin: 5px;
     }
+
+    #answer{
+        flex: 1;
+        border: none;
+        border-radius: 10px;
+        outline: none;
+        resize: none;
+        overflow-y: auto;
+        /* background: transparent; */
+        background-color: rgba(164, 214, 255, 0.897);
+        color: rgb(12, 12, 12);
+        font-size: 16px;
+        line-height: 1.5;
+        max-height: 100px;
+        width: 200px;
+}
+    
     .question{
         width: 200%;
         max-width: 650px;
-        font-size: 9px;
+        font-size: 12px;
+        font-weight: bold;
         /* align-items: baseline; */
     }
 

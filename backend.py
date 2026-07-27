@@ -178,13 +178,15 @@ def show_task():
             skiped.append(task_name)
             with open('skip.txt','w') as f:
                 json.dump(skiped,f)
-            
+                
             return redirect(url_for('show_task'))
 
         elif action == 'quit':
             return render_template('solo leveling.html')
 
     # GET request or after handling POST — show all levels and tasks
+    with open('xp.txt','r') as f:
+        content = f.read()
 
     levels = None
     tasks = None
@@ -264,7 +266,8 @@ def show_task():
         Learning_Resource = resource,
         levels=levels,
         tasks=tasks,
-        difficulty = difficultys
+        difficulty = difficultys,
+        content = content
         )
 
 def answered_question():
@@ -463,8 +466,10 @@ def pending_task():
         remove_file(files)
         return render_template('final.html')
     
+    with open('xp.txt','r') as f:
+        content = f.read()
     return render_template('pending_task.html',
-                           tasks = tasks)
+                           tasks = tasks, content = content)
 
 
 def complete():

@@ -7,46 +7,56 @@
     <title>Tasks</title>
 </head>
 <body>
+    <video autoplay muted loop class="bg-video" preload="none">
+        <source src="{{ url_for('static', filename='video/solo leveling.mp4') }}" type="video/mp4">
+    </video>
 
     <nav class="navigation">
         <a href = "{{ url_for('home') }}" class="solo_leveling">Solo Leveling</p>
         <a href=" " class="nav-link">About me</a>
     </nav>
 
-
+    <div class="xpp">
+        <div>
+            <h2 class="xp">XP points: {{content}}</h2>
+        </div>
+    </div>
+    
     <div class="container">
-        <div class="card">
+        <div class="semi-box">
+            <div class="card">
+                <h2>Resource: {{levels["Learning_Resource"]}}</h2>
+                <h2>Level: {{ levels["level_number"] }}</h2>
+                <h3>{{ levels["level_name"] }}</h3>
+                <p>{{ levels["description"] }}</p>
 
-            <h2>Level {{ levels["level_number"] }}</h2>
-            <h3>{{ levels["level_name"] }}</h3>
-            <p>{{ levels["description"] }}</p>
+                <hr>
 
-            <hr>
+                <h2>{{ tasks["task_name"] }}</h2>
+                <p>Difficulty: {{ tasks["difficulty"] }}</p>
+                <p>Reward: {{ tasks["xp_reward"] }} XP</p>
 
-            <h2>{{ tasks["task_name"] }}</h2>
-            <p>Difficulty: {{ tasks["difficulty"] }}</p>
-            <p>Reward: {{ tasks["xp_reward"] }} XP</p>
+                <form method="POST">
+                    <input
+                        type="hidden"
+                        name="task_name"
+                        value="{{ tasks['task_name'] }}">
 
-            <form method="POST">
-                <input
-                    type="hidden"
-                    name="task_name"
-                    value="{{ tasks['task_name'] }}">
+                    <input
+                        type="hidden"
+                        name="xp_reward"
+                        value="{{ tasks['xp_reward'] }}">
 
-                <input
-                    type="hidden"
-                    name="xp_reward"
-                    value="{{ tasks['xp_reward'] }}">
+                    <input
+                        type="hidden"
+                        name="difficulty"
+                        value="{{ tasks['difficulty'] }}">
 
-                <input
-                    type="hidden"
-                    name="difficulty"
-                    value="{{ tasks['difficulty'] }}">
-
-                <button name="action" value="yes">Complete</button>
-                <button name="action" value="no">Later</button>
-                <button name="action" value="skip">Skip (-20 XP)</button>
-            </form>
+                    <button name="action" value="yes">Complete</button>
+                    <button name="action" value="no">Later</button>
+                    <button name="action" value="skip">Skip (-20 XP)</button>
+                </form>
+            </div>
         </div>
     </div>
 
