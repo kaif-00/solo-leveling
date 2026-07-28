@@ -6,6 +6,87 @@ from pyngrok import ngrok,conf
 import json
 import os
 
+def dataa():
+    try:
+        with open('level.json','r') as f:
+            content = json.load(f)
+        return content
+    except FileNotFoundError:
+        return None
+
+def get_question_level():
+    try:
+        with open('question.txt','r') as f:
+            content = f.read().strip()
+            return json.loads(content) if content else []
+    except FileNotFoundError:
+        return []
+
+def write_question_level(lvl_num):
+    qust = get_question_level()
+    if lvl_num not in qust:
+        qust.append(lvl_num)
+    with open('question.txt','w') as f:
+        json.dump(qust,f)
+
+
+def answered_question():
+    try:
+        with open('answered.txt', 'r') as f:
+            content = f.read().strip()
+        return json.loads(content) if content else []
+    except FileNotFoundError:
+        return []
+
+def remove_file(files):
+    for f in files:
+        try:
+            os.remove(f)
+        except FileNotFoundError:
+            pass
+
+def complete():
+    try:
+        with open('complete.txt','r') as f:
+            content = json.load(f)
+        return content
+    except FileNotFoundError:
+        return []
+def skip():
+        try:
+            with open('skip.txt','r') as f:
+                content = json.load(f)
+            return content
+        except FileNotFoundError:
+            return []
+
+
+def pending_data():
+    try:
+        with open('pending.json','r') as f:
+            content = f.read().strip()
+            return json.loads(content) if content else []
+    except FileNotFoundError:
+        return []
+
+def pending_complete():
+        try:
+            with open('pending_complete.txt','r') as f:
+                content = json.load(f)
+            return content
+        except FileNotFoundError:
+            return []
+
+def pending_skip():
+    try:
+        with open('pending_skip.txt','r') as f:
+                content = json.load(f)
+        return content
+    except FileNotFoundError:
+        return []
+
+
+
 backend = Flask(__name__)
 @backend.route('/',methods=['GET','POST'])
 def home():
@@ -75,29 +156,7 @@ def new_goal():
     return render_template('new_goal.html')
 
 
-def dataa():
-    try:
-        with open('level.json','r') as f:
-            content = json.load(f)
-        return content
-    except FileNotFoundError:
-        return None
     
-
-def get_question_level():
-    try:
-        with open('question.txt','r') as f:
-            content = f.read().strip()
-            return json.loads(content) if content else []
-    except FileNotFoundError:
-        return []
-
-def write_question_level(lvl_num):
-    qust = get_question_level()
-    if lvl_num not in qust:
-        qust.append(lvl_num)
-    with open('question.txt','w') as f:
-        json.dump(qust,f)
 
 backend.secret_key = 'secret' 
 @backend.route('/show_task',methods=['GET','POST'])
@@ -185,8 +244,6 @@ def show_task():
             return render_template('solo leveling.html')
 
     # GET request or after handling POST — show all levels and tasks
-    with open('xp.txt','r') as f:
-        content = f.read()
 
     levels = None
     tasks = None
@@ -261,33 +318,25 @@ def show_task():
                     pass
             return render_template('final.html')
 
-        return render_template(
-        "show_task.html",
-        Learning_Resource = resource,
-        levels=levels,
-        tasks=tasks,
-        difficulty = difficultys,
-        content = content
-        )
+    with open('xp.txt','r') as f:
+        content = f.read()
 
-def answered_question():
-    try:
-        with open('answered.txt', 'r') as f:
-            content = f.read().strip()
-        return json.loads(content) if content else []
-    except FileNotFoundError:
-        return []
+    return render_template(
+    "show_task.html",
+    Learning_Resource = resource,
+    levels=levels,
+    tasks=tasks,
+    difficulty = difficultys,
+    content = content
+    )
 
-def remove_file(files):
-    for f in files:
-        try:
-            os.remove(f)
-        except FileNotFoundError:
-            pass
 
 @backend.route('/question',methods=['GET','POST'])
 def show_question():
     answered = answered_question()
+    data = dataa()
+    completes = complete()
+    question_levels = get_question_level()
     if request.method == 'POST':
         question = request.form.get('question')
         answer = request.form.get('answer')
@@ -315,9 +364,6 @@ def show_question():
             mark = f.read()
         
         if int(mark) < 50:
-            data = dataa()
-            completes = complete()
-            question_levels = get_question_level()
 
             if data:
                 for lvl in data['levels']:
@@ -330,8 +376,8 @@ def show_question():
                             if t['task_name'] in completes:
                                 completes.remove(t['task_name'])
 
-                            with open('complete.txt', 'w') as f:
-                                json.dump(completes,f)
+                        with open('complete.txt', 'w') as f:
+                            json.dump(completes,f)
             file_name = ['answered.txt','question.json','mark.txt']
             remove_file(file_name)
             return redirect(url_for('show_task'))
@@ -340,10 +386,12 @@ def show_question():
             answered.append(question)
             with open('answered.txt', 'w') as f:
                 json.dump(answered, f)
-
-    with open('question.json','r') as f:
-        content = json.load(f)
-
+    try:
+        with open('question.json','r') as f:
+            content = json.load(f)
+    except:
+        return redirect(url_for('home'))
+    
     question = None
     for qust in list(content):
         if qust not in answered:
@@ -359,9 +407,8 @@ def show_question():
                 all_done = all(t['task_name'] in completess 
                                for t in lvl['tasks'])
                 if all_done and lvl['level_number'] not in question_level:
-                    for t in lvl['tasks']:
-                        write_question_level(lvl['level_number'])
-                        break
+                    write_question_level(lvl['level_number'])
+                    break
         
         files = ['mark.txt','answered.txt','question.json']
         remove_file(files)
@@ -372,29 +419,6 @@ def show_question():
 
 
 
-def pending_data():
-    try:
-        with open('pending.json','r') as f:
-            content = f.read().strip()
-            return json.loads(content) if content else []
-    except FileNotFoundError:
-        return []
-
-def pending_complete():
-        try:
-            with open('pending_complete.txt','r') as f:
-                content = json.load(f)
-            return content
-        except FileNotFoundError:
-            return []
-
-def pending_skip():
-    try:
-        with open('pending_skip.txt','r') as f:
-                content = json.load(f)
-        return content
-    except FileNotFoundError:
-        return []
         
 @backend.route('/pending_task',methods=['GET','POST'])
 def pending_task():
@@ -471,21 +495,6 @@ def pending_task():
     return render_template('pending_task.html',
                            tasks = tasks, content = content)
 
-
-def complete():
-    try:
-        with open('complete.txt','r') as f:
-            content = json.load(f)
-        return content
-    except FileNotFoundError:
-        return []
-def skip():
-        try:
-            with open('skip.txt','r') as f:
-                content = json.load(f)
-            return content
-        except FileNotFoundError:
-            return []
 
 conf.get_default().auth_token='3Ga0kzoko9TRMvUZOzCWgV9iiNz_51DugyUD4sDdCzxrRJFcd'
 

@@ -7,6 +7,10 @@
     <title>Qusetion</title>
 </head>
 <body>
+    <video autoplay muted loop class="bg-video" preload="none">
+        <source src="{{ url_for('static', filename='video/solo leveling.mp4') }}" type="video/mp4">
+    </video>
+
     <nav class="navigation">
         <a href = "{{ url_for('home') }}" class="solo_leveling">Solo Leveling</p>
         <a href=" " class="nav-link">About me</a>
@@ -18,8 +22,9 @@
 
             <form class="Input" method="POST">
                 <input type="hidden" name="question" value="{{ question }}">
-                <label for="answer">Enter Answer:</label>
+                <label for="answer"></label>
                 <textarea id="answer" name="answer" placeholder="Enter Answer"></textarea>
+                <button type="submit" class="button">Submit</button>
             </form>
         </div>
     </div>

@@ -74,6 +74,16 @@
     backdrop-filter:blur(12px);
 }
 
+.button{
+    border: none;
+    outline: none;
+    padding: 10px;
+    background-color: rgb(96, 184, 255);
+    border:1px solid rgba(0,132,255,.4);
+    border-radius: 5px;
+}
+
+
 .xpp{
     display: flex;
     justify-content:baseline;

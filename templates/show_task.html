@@ -36,7 +36,7 @@
                 <p>Difficulty: {{ tasks["difficulty"] }}</p>
                 <p>Reward: {{ tasks["xp_reward"] }} XP</p>
 
-                <form method="POST">
+                <form method="POST" class="Input">
                     <input
                         type="hidden"
                         name="task_name"
@@ -52,9 +52,9 @@
                         name="difficulty"
                         value="{{ tasks['difficulty'] }}">
 
-                    <button name="action" value="yes">Complete</button>
-                    <button name="action" value="no">Later</button>
-                    <button name="action" value="skip">Skip (-20 XP)</button>
+                    <button name="action" value="yes" class="button">Complete</button>
+                    <button name="action" value="no" class="button">Later</button>
+                    <button name="action" value="skip" class="button">Skip (-20 XP)</button>
                 </form>
             </div>
         </div>
