@@ -107,6 +107,41 @@
     border-radius: 20px;
     padding: 40px;
 }
+.error_box{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.error{ display: flex;
+        justify-content: center; 
+        justify-items: center;
+        background-color: rgba(119, 0, 255, 0.397); 
+        padding: 5px; border-radius: 5px; 
+        color: rgb(252, 251, 251); 
+        font-size: 14px; opacity: 1; 
+    animation: fadeOut 4s forwards;
+}
+
+.button{
+    border: none;
+    outline: none;
+    padding: 10px;
+    background-color: rgb(96, 184, 255);
+    border:1px solid rgba(0,132,255,.4);
+    border-radius: 5px;
+}
+
+@keyframes fadeOut{
+    0%, 50%{
+        opacity: 1;
+    }
+
+    100%{
+        opacity: 0;
+    }
+}
 
 @media (max-width: 480px){
     .solo_leveling{
