@@ -5,6 +5,7 @@ from ollama import chat
 from pyngrok import ngrok,conf
 import json
 import os
+import re
 
 def dataa():
     try:
@@ -72,16 +73,16 @@ def pending_data():
 def pending_complete():
         try:
             with open('pending_complete.txt','r') as f:
-                content = json.load(f)
-            return content
+                content = f.read().strip()
+            return json.loads(content) if content else []
         except FileNotFoundError:
             return []
 
 def pending_skip():
     try:
         with open('pending_skip.txt','r') as f:
-                content = json.load(f)
-        return content
+                content = f.read().strip()
+        return json.loads(content) if content else []
     except FileNotFoundError:
         return []
 
@@ -112,14 +113,13 @@ def model(prompt):
          - No markdown
 
          Create exactly 5 levels.
-
-         Each level must include:
-         - Learning_Resource
-         - level_number
-         - level_name
-         - description
-         - total_xp_required
-         - tasks (3 tasks)
+         -levels
+            - learning_Resource
+            - level_number
+            - level_name
+            - description
+            - total_xp_required
+            - tasks (3 tasks)
 
          Each task must include:
          - task_name
@@ -256,7 +256,7 @@ def show_task():
     else:
         for lvl in data["levels"]:
             lvl_tasks = lvl['tasks']
-            resource = lvl['Learning_Resource']
+            resource = lvl['learning_Resource']
 
             all_done = all(                     #so this checks if all tasks are completed
                                                 #if any task remain then the if condition fails and it goes 
@@ -281,6 +281,7 @@ def show_task():
                     break
             else:
                 if lvl['level_number'] not in question_levels:
+                    if not os.path.exists('question.json'):
                         api = os.getenv('API_KEY')
                         client = OpenAI(
                             api_key=api,
@@ -309,26 +310,24 @@ def show_task():
                 continue
 
         else:
-            files = ['complete.txt','skip.txt','level.json']
-
-            for i in files:
-                try:
-                    os.remove(i)
-                except FileNotFoundError:
-                    pass
+            files = ['complete.txt','skip.txt','question.json','question.txt','level.json','xp.txt']
+            remove_file(files)
             return render_template('final.html')
 
-    with open('xp.txt','r') as f:
-        content = f.read()
+        try:
+            with open('xp.txt','r') as f:
+                content = f.read()
+        except FileNotFoundError:
+            content = '0'
 
-    return render_template(
-    "show_task.html",
-    Learning_Resource = resource,
-    levels=levels,
-    tasks=tasks,
-    difficulty = difficultys,
-    content = content
-    )
+        return render_template(
+        "show_task.html",
+        Learning_Resource = resource,
+        levels=levels,
+        tasks=tasks,
+        difficulty = difficultys,
+        content = content
+        )
 
 
 @backend.route('/question',methods=['GET','POST'])
@@ -337,9 +336,17 @@ def show_question():
     data = dataa()
     completes = complete()
     question_levels = get_question_level()
+    pending = pending_data()                              # ← add
+    pending_names = [task["task_name"] for task in pending]  # ← add
+    skips = skip()  
+
     if request.method == 'POST':
         question = request.form.get('question')
-        answer = request.form.get('answer')
+        answer = request.form.get('answer','').strip()
+
+        if not answer:
+            return render_template('question.html', question=question, error='Answer cannot be empty.')
+
         api = os.getenv('API_KEY')
         client = OpenAI(
             api_key=api,
@@ -362,13 +369,17 @@ def show_question():
 
         with open('mark.txt','r') as f:
             mark = f.read()
-        
-        if int(mark) < 50:
+
+
+        mark_number = int(re.search(r'\d+', mark).group())
+        if mark_number < 50:
 
             if data:
-                for lvl in data['levels']:
-                    all_done = all(
-                        t['task_name'] in completes
+                for lvl in data['levels']:    # so we also add all the complete, pending and skip check as show task have
+                    all_done = all(           #
+                        t['task_name'] in completes or
+                        t['task_name'] in pending_names or  
+                        t['task_name'] in skips       
                         for t in lvl['tasks']
                     )
                     if all_done and lvl['level_number'] not in question_levels:
@@ -376,16 +387,29 @@ def show_question():
                             if t['task_name'] in completes:
                                 completes.remove(t['task_name'])
 
+                        # pending = pending_data()
+                        updated_pending = []
+                        level_task_name = [t['task_name'] for t in lvl['tasks']]
+                        for p in pending:
+                            if p['task_name'] not in level_task_name:
+                                updated_pending.append(p)
+                            with open('pending.json', 'w') as f:
+                                json.dump(updated_pending, f)
+
                         with open('complete.txt', 'w') as f:
                             json.dump(completes,f)
+
+            
             file_name = ['answered.txt','question.json','mark.txt']
             remove_file(file_name)
+
             return redirect(url_for('show_task'))
         
         else:
             answered.append(question)
             with open('answered.txt', 'w') as f:
                 json.dump(answered, f)
+            return redirect(url_for('show_question'))
     try:
         with open('question.json','r') as f:
             content = json.load(f)
@@ -398,15 +422,15 @@ def show_question():
             question = qust
             break
     else:
-        datas = dataa()
-        completess = complete()
-        question_level = get_question_level()
 
-        if datas:
-            for lvl in datas['levels']:
-                all_done = all(t['task_name'] in completess 
+
+        if data:
+            for lvl in data['levels']:
+                all_done = all(t['task_name'] in completes or
+                               t['task_name'] in pending_names or
+                               t['task_name'] in skips
                                for t in lvl['tasks'])
-                if all_done and lvl['level_number'] not in question_level:
+                if all_done and lvl['level_number'] not in question_levels:
                     write_question_level(lvl['level_number'])
                     break
         
@@ -416,8 +440,6 @@ def show_question():
         
     return render_template('question.html',
                                question = question)
-
-
 
         
 @backend.route('/pending_task',methods=['GET','POST'])
@@ -478,11 +500,10 @@ def pending_task():
     tasks = None
     ind = None
 
-    for indx,tk in enumerate(list(ddata)):
+    for tk in ddata:
         if (tk["task_name"] not in p_s and
             tk["task_name"] not in p_c):
             # clean = ddata.pop(ind)
-            ind = indx
             tasks = tk
             break
     else:
@@ -490,8 +511,12 @@ def pending_task():
         remove_file(files)
         return render_template('final.html')
     
-    with open('xp.txt','r') as f:
-        content = f.read()
+
+    try:
+        with open('xp.txt','r') as f:
+            content = f.read()
+    except FileNotFoundError:
+        content = '0'
     return render_template('pending_task.html',
                            tasks = tasks, content = content)
 
