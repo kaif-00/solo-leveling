@@ -374,9 +374,13 @@ def show_question():
         mark_number = int(re.search(r'\d+', mark).group())
         if mark_number < 50:
 
-            if data:
-                for lvl in data['levels']:    # so we also add all the complete, pending and skip check as show task have
-                    all_done = all(           #
+            if data:   #this runs the marks is less then 50 and then it deletes all
+                       #the task that is completed and pending and skiped for that 
+                       #level so that user can do the task again
+                       
+                for lvl in data['levels']:    # so we also add all the complete,
+                                              #pending and skip check as (show_task) have
+                    all_done = all(
                         t['task_name'] in completes or
                         t['task_name'] in pending_names or  
                         t['task_name'] in skips       
@@ -387,19 +391,18 @@ def show_question():
                             if t['task_name'] in completes:
                                 completes.remove(t['task_name'])
 
-                        # pending = pending_data()
+                        with open('complete.txt', 'w') as f:
+                            json.dump(completes,f)
+
                         updated_pending = []
                         level_task_name = [t['task_name'] for t in lvl['tasks']]
+
                         for p in pending:
                             if p['task_name'] not in level_task_name:
                                 updated_pending.append(p)
                             with open('pending.json', 'w') as f:
                                 json.dump(updated_pending, f)
 
-                        with open('complete.txt', 'w') as f:
-                            json.dump(completes,f)
-
-            
             file_name = ['answered.txt','question.json','mark.txt']
             remove_file(file_name)
 
@@ -416,15 +419,16 @@ def show_question():
     except:
         return redirect(url_for('home'))
     
-    question = None
+    question = None          #so this is the main logic for showing the question page,
+                             #it checks if any question is not answered then it shows that question
     for qust in list(content):
         if qust not in answered:
             question = qust
             break
     else:
 
-
-        if data:
+        if data:                        #this is the logic for checking if all tasks are completed
+                                        #for a level then it writes that level number in question.txt
             for lvl in data['levels']:
                 all_done = all(t['task_name'] in completes or
                                t['task_name'] in pending_names or
@@ -436,7 +440,8 @@ def show_question():
         
         files = ['mark.txt','answered.txt','question.json']
         remove_file(files)
-        return redirect(url_for('show_task'))
+        return redirect(url_for('show_task')) #if user failed the 50 mark then it goes to the
+                                              #(show_task) page
         
     return render_template('question.html',
                                question = question)
