@@ -15,7 +15,11 @@
         <a href = "{{ url_for('home') }}" class="solo_leveling">Solo Leveling</p>
         <a href=" " class="nav-link">About me</a>
     </nav>
-    
+    {% if error %}
+        <div class="error_box">
+            <p class="error">{{ error }}</p>
+        </div>
+    {% endif %}
     <div class="hintbox">
         <div class="hint">
             <p>Enter your goal like I want to learn something.</p>
@@ -26,6 +30,7 @@
         <form class="Input" method="post">
             <label for="Enter_Goal">Enter a Goal :</label><br>
             <textarea name="goal" id="goal" placeholder="Enter your goal"></textarea>
+            <button type="submit" class="button">Submit</button>
         </form>
     </div>
 

@@ -15,7 +15,13 @@
         <a href = "{{ url_for('home') }}" class="solo_leveling">Solo Leveling</p>
         <a href=" " class="nav-link">About me</a>
     </nav>
-    
+
+    {% if error %}
+        <div class="error_box">
+            <p class="error">{{ error }}</p>
+        </div>
+    {% endif %}
+
     <div class="quest">
         <div class="question">
             <p>{{ question }}</p>
