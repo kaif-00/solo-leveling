@@ -460,13 +460,16 @@ def pending_task():
         difficulty = request.form.get('difficulty')
         xp_reward = int(request.form.get('xp_reward'))
 
-
+        
         if 'yes' == action:
 
             a = xp_reward
             # clean = ddata.pop(ind)
-            with open('xp.txt', 'r') as f:
-                x = int(f.read())
+            try:
+                with open('xp.txt', 'r') as f:
+                    x = int(f.read())
+            except FileNotFoundError:
+                x = 0
             n = x + a
             print(f'complete: {n}')
             with open('xp.txt','w') as f:
