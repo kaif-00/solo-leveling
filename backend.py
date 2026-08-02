@@ -515,7 +515,7 @@ def pending_task():
             tasks = tk
             break
     else:
-        files = ['pending_complete.txt','pending_skip.txt','pending.json']
+        files = ['pending_complete.txt','pending_skip.txt','pending.json','xp.txt']
         remove_file(files)
         return render_template('final.html')
     
