@@ -1,11 +1,25 @@
-from flask import Flask, request, render_template, redirect,url_for,flash
-from dotenv import load_dotenv
-from openai import OpenAI
-from ollama import chat
+from flask import Flask, request, render_template, redirect,url_for,session
+from flask_sqlalchemy import SQLAlchemy
 from pyngrok import ngrok,conf
+from openai import OpenAI
 import json
 import os
 import re
+
+backend = Flask(__name__)
+# db = SQLAlchemy(backend)
+# with this line we are connecting the database with the flask app and we are using sqlite database
+# backend.config['SQL_DATABASE_URI']='sqlite:///database.db'
+# backend.config['SECRET_KEY'] = 'secretkey'
+
+# class User(db.Model):
+#     id=db.Column(db.Integer,primery_key=True)
+#     password = db.Column(db.string(80),nullable=False)
+#     username = db.Column(db.string(35),nullable=False, unique=True)
+
+# with backend.app_context():
+#     db.create_all()
+
 
 def dataa():
     try:
@@ -87,8 +101,21 @@ def pending_skip():
         return []
 
 
+# @backend.route('/',methods=['GET','POST'])
+# def register():
+#     if request.method == 'POST':
+#         name = request.form.get('name')
+#         password = request.form.get('passowrd')
 
-backend = Flask(__name__)
+#     # existing = User.query.filter_by(user)
+#     if not name or not password:
+#         return render_template('register.html',error = 'please enter all detail')
+
+#     new_user = User(name = name, password = password)
+#     db.session.add(new_user)
+#     db.session.commit()
+#     return render_template('register.html')
+
 @backend.route('/',methods=['GET','POST'])
 def home():
     return render_template('solo leveling.html')
@@ -156,7 +183,6 @@ def new_goal():
     return render_template('new_goal.html')
 
 
-    
 
 backend.secret_key = 'secret' 
 @backend.route('/show_task',methods=['GET','POST'])
@@ -250,7 +276,7 @@ def show_task():
     difficultys = None
     resource = None
     if data is None:
-        flash('No goal selected')
+        # flash('No goal selected')
         return redirect(url_for('new_goal'))
     
     else:
