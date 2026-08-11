@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template, redirect,url_for,session
-from flask_sqlalchemy import SQLAlchemy
+# from flask_sqlalchemy import SQLAlchemy
 from pyngrok import ngrok,conf
 from openai import OpenAI
 import json
