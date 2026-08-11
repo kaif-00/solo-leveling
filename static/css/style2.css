@@ -74,7 +74,7 @@
     border-radius: 10px;
     /* background: transparent; */
     background-color: rgb(96, 184, 255);
-    color: rgb(253, 254, 255);
+    color: rgb(10, 10, 10);
     font-size: 16px;
     line-height: 1.5;
     max-height: 200px;
@@ -106,6 +106,7 @@
     text-shadow: 10px 10px 19px rgb(0, 0, 0);
     border-radius: 20px;
     padding: 40px;
+    gap: 10px;
 }
 .error_box{
     display: flex;
@@ -114,13 +115,14 @@
     margin-top: 10px;
 }
 
-.error{ display: flex;
-        justify-content: center; 
-        justify-items: center;
-        background-color: rgba(119, 0, 255, 0.397); 
-        padding: 5px; border-radius: 5px; 
-        color: rgb(252, 251, 251); 
-        font-size: 14px; opacity: 1; 
+.error{ 
+    display: flex;
+    justify-content: center; 
+    justify-items: center;
+    background-color: rgba(119, 0, 255, 0.397); 
+    padding: 5px; border-radius: 5px; 
+    color: rgb(252, 251, 251); 
+    font-size: 14px; opacity: 1; 
     animation: fadeOut 4s forwards;
 }
 
