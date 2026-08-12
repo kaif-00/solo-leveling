@@ -17,6 +17,12 @@
         <a href=" " class="nav-link">About me</a>
     </nav>
     
+    {% if error %}
+        <div class="error_box">
+            <p class="error">{{ error }}</p>
+        </div>
+    {% endif %}
+    
     <div class="box">
         <form class="Input" method="post">
             <label for="Enter_name">Enter Name :</label><br>
