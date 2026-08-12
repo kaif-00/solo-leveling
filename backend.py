@@ -300,7 +300,7 @@ def show_task():
                 with open(f'{folder}/xp.txt', 'r') as f:
                     current_xp = int(f.read())
             except FileNotFoundError:
-                current_xp = 0
+                current_xp = '0'
             if current_xp < 20:
                 # re-render with error message
                 data = dataa()
