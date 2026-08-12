@@ -304,7 +304,7 @@ def show_task():
             if int(current_xp) < 20:
                 # re-render with error message
                 data = dataa()
-                return render_template(url_for('show_task'))
+                return redirect(url_for('show_task'))
             
             new_xp = current_xp - 20
             with open(f'{folder}/xp.txt', 'w') as f:
