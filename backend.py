@@ -611,17 +611,6 @@ def pending_task():
     return render_template('pending_task.html',
                            tasks = tasks, content = content)
 
-
-conf.get_default().auth_token='3Ga0kzoko9TRMvUZOzCWgV9iiNz_51DugyUD4sDdCzxrRJFcd'
-
-tunnels = ngrok.get_tunnels()
-print(f'Active tunnels: {tunnels}')
-for tunnel in tunnels:
-    print(f'Closing: {tunnel.public_url}')
-    ngrok.disconnect(tunnel.public_url)
-
-ngrok.kill()
-print('All tunnels closed')
 if __name__ == '__main__':
     if os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
         public_url = ngrok.connect(5000)
