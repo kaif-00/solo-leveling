@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/style8.css')}}">
+    <title>Login</title>
+</head>
+
+<body>
+    <video autoplay muted loop class="bg-video" preload="none">
+        <source src="{{ url_for('static', filename='video/solo_1.mp4') }}" type="video/mp4">
+    </video>
+
+    <nav class="navigation">
+        <a class="solo_leveling">Solo Leveling</p>
+        <a href=" " class="nav-link">About me</a>
+    </nav>
+    
+    <div class="box">
+        <form class="Input" method="post">
+            <label for="Enter_name">Enter Name :</label><br>
+            <textarea name="username" placeholder="Enter Name" id="detail"></textarea>
+            
+            <label for="Enter_password">Enter Password :</label><br>
+            <textarea name="password" placeholder="Enter Password" id="detail"></textarea>
+            <button type="submit" class="button">Submit</button>
+        </form>
+    </div>
+</body>
+</html>

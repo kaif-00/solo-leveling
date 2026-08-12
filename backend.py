@@ -1,29 +1,40 @@
 from flask import Flask, request, render_template, redirect,url_for,session
-# from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_sqlalchemy import SQLAlchemy
 from pyngrok import ngrok,conf
 from openai import OpenAI
 import json
 import os
 import re
 
+
 backend = Flask(__name__)
-# db = SQLAlchemy(backend)
 # with this line we are connecting the database with the flask app and we are using sqlite database
-# backend.config['SQL_DATABASE_URI']='sqlite:///database.db'
-# backend.config['SECRET_KEY'] = 'secretkey'
+backend.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///User.db'
+backend.config['SECRET_KEY'] = 'secretkey'
+db = SQLAlchemy(backend)
 
-# class User(db.Model):
-#     id=db.Column(db.Integer,primery_key=True)
-#     password = db.Column(db.string(80),nullable=False)
-#     username = db.Column(db.string(35),nullable=False, unique=True)
+class User(db.Model):
+    id=db.Column(db.Integer,primary_key=True)
+    username = db.Column(db.String(35),nullable=False, unique=True)
+    password = db.Column(db.String(80),nullable=False)
 
-# with backend.app_context():
-#     db.create_all()
+with backend.app_context():
+    db.create_all()
 
+def user_folder():
+    user = session.get('username')
+    if not user:
+        return None
+
+    path = f'data/{user}'
+    os.makedirs(path, exist_ok = True)
+    return path
 
 def dataa():
     try:
-        with open('level.json','r') as f:
+        folder = user_folder()
+        with open(f'{folder}/level.json','r') as f:
             content = json.load(f)
         return content
     except FileNotFoundError:
@@ -31,7 +42,8 @@ def dataa():
 
 def get_question_level():
     try:
-        with open('question.txt','r') as f:
+        folder = user_folder()
+        with open(f'{folder}/question.txt','r') as f:
             content = f.read().strip()
             return json.loads(content) if content else []
     except FileNotFoundError:
@@ -39,37 +51,43 @@ def get_question_level():
 
 def write_question_level(lvl_num):
     qust = get_question_level()
+    folder = user_folder()
+
     if lvl_num not in qust:
         qust.append(lvl_num)
-    with open('question.txt','w') as f:
+    with open(f'{folder}/question.txt','w') as f:
         json.dump(qust,f)
 
 
 def answered_question():
     try:
-        with open('answered.txt', 'r') as f:
+        folder = user_folder()
+        with open(f'{folder}/answered.txt', 'r') as f:
             content = f.read().strip()
         return json.loads(content) if content else []
     except FileNotFoundError:
         return []
 
 def remove_file(files):
+    folder = user_folder()
     for f in files:
         try:
-            os.remove(f)
+            os.remove(f'{folder}/{f}')
         except FileNotFoundError:
             pass
 
 def complete():
     try:
-        with open('complete.txt','r') as f:
+        folder = user_folder()
+        with open(f'{folder}/complete.txt','r') as f:
             content = json.load(f)
         return content
     except FileNotFoundError:
         return []
 def skip():
         try:
-            with open('skip.txt','r') as f:
+            folder = user_folder()
+            with open(f'{folder}/skip.txt','r') as f:
                 content = json.load(f)
             return content
         except FileNotFoundError:
@@ -78,7 +96,8 @@ def skip():
 
 def pending_data():
     try:
-        with open('pending.json','r') as f:
+        folder = user_folder()
+        with open(f'{folder}/pending.json','r') as f:
             content = f.read().strip()
             return json.loads(content) if content else []
     except FileNotFoundError:
@@ -86,7 +105,8 @@ def pending_data():
 
 def pending_complete():
         try:
-            with open('pending_complete.txt','r') as f:
+            folder = user_folder()
+            with open(f'{folder}/pending_complete.txt','r') as f:
                 content = f.read().strip()
             return json.loads(content) if content else []
         except FileNotFoundError:
@@ -94,33 +114,66 @@ def pending_complete():
 
 def pending_skip():
     try:
-        with open('pending_skip.txt','r') as f:
+        folder = user_folder()
+        with open(f'{folder}/pending_skip.txt','r') as f:
                 content = f.read().strip()
         return json.loads(content) if content else []
     except FileNotFoundError:
         return []
 
 
-# @backend.route('/',methods=['GET','POST'])
-# def register():
-#     if request.method == 'POST':
-#         name = request.form.get('name')
-#         password = request.form.get('passowrd')
-
-#     # existing = User.query.filter_by(user)
-#     if not name or not password:
-#         return render_template('register.html',error = 'please enter all detail')
-
-#     new_user = User(name = name, password = password)
-#     db.session.add(new_user)
-#     db.session.commit()
-#     return render_template('register.html')
 
 @backend.route('/',methods=['GET','POST'])
+def index():
+    return render_template('index.html')
+
+
+@backend.route('/sign_up',methods=['GET','POST'])
+def sign_up():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        existing = User.query.filter_by(username = username).first()
+
+        if existing :
+            return render_template('sign_up.html', error = 'Username already exists')
+
+        hashed = generate_password_hash(password)
+        new_user = User(username = username, password = hashed)
+        db.session.add(new_user)
+        db.session.commit()
+
+        os.makedirs(f'data/{username}', exist_ok=True)
+        session['username'] = username
+        return redirect(url_for('home'))
+    
+    return render_template('sign_up.html')
+
+
+@backend.route('/login',methods=['GET','POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        existing = User.query.filter_by(username = username).first()
+
+        if not existing or not check_password_hash(existing.password,password):
+            return render_template('login.html', error = 'Invalid credentials')
+        
+        session['username'] = username
+        return redirect(url_for('home'))
+    
+    return render_template('login.html')
+
+
+@backend.route('/home',methods=['GET','POST'])
 def home():
     return render_template('solo leveling.html')
 
+
 def model(prompt):
+    folder = user_folder()
     api = os.getenv('API_KEY')
     client = OpenAI(
         api_key=api,
@@ -169,9 +222,8 @@ def model(prompt):
     content = response.choices[0].message.content
 
     data = json.loads(content)
-    with open('level.json','w') as f:
+    with open(f'{folder}/level.json','w') as f:
         json.dump(data,f)
-
 
 @backend.route('/new_goal', methods=['GET','POST'])
 def new_goal():
@@ -183,15 +235,14 @@ def new_goal():
     return render_template('new_goal.html')
 
 
-
-backend.secret_key = 'secret' 
 @backend.route('/show_task',methods=['GET','POST'])
 def show_task():
+    folder = user_folder()
     data = dataa()
-    completes = complete()
     skips = skip()
-    question_levels = get_question_level()
+    completes = complete()
     pending = pending_data()
+    question_levels = get_question_level()
 
     pending_names = [task["task_name"] for task in pending]
 
@@ -204,18 +255,19 @@ def show_task():
 
         if action == 'yes':
             try:
-                with open('xp.txt', 'r') as f:
+                folder = user_folder()
+                with open(f'{folder}/xp.txt', 'r') as f:
                     current_xp = int(f.read())
             except:
                 current_xp = 0
 
             new_xp = current_xp + xp_reward
-            with open('xp.txt', 'w') as f:
+            with open(f'{folder}/xp.txt', 'w') as f:
                 f.write(str(new_xp))
 
             completed = complete()
             completed.append(task_name)
-            with open('complete.txt', 'w') as f:
+            with open(f'{folder}/complete.txt', 'w') as f:
                 json.dump(completed, f)
 
             return redirect(url_for('show_task'))
@@ -223,7 +275,7 @@ def show_task():
         elif action == 'no':
 
             try:
-                with open('pending.json', 'r') as f:
+                with open(f'{folder}/pending.json', 'r') as f:
                     content = f.read().strip()
                     pending = json.loads(content) if content else []
 
@@ -236,7 +288,7 @@ def show_task():
                 'xp_reward': xp_reward
             })
 
-            with open('pending.json', 'w') as f:
+            with open(f'{folder}/pending.json', 'w') as f:
                 json.dump(pending, f)
 
             return redirect(url_for('show_task'))
@@ -244,7 +296,7 @@ def show_task():
         elif action == 'skip':
             
             try:
-                with open('xp.txt', 'r') as f:
+                with open(f'{folder}/xp.txt', 'r') as f:
                     current_xp = int(f.read())
             except FileNotFoundError:
                 current_xp = 0
@@ -256,12 +308,12 @@ def show_task():
                     error='Not enough XP to skip. Need 20 XP.')
             
             new_xp = current_xp - 20
-            with open('xp.txt', 'w') as f:
+            with open(f'{folder}/xp.txt', 'w') as f:
                 f.write(str(new_xp))
             
             skiped = skip()
             skiped.append(task_name)
-            with open('skip.txt','w') as f:
+            with open(f'{folder}/skip.txt','w') as f:
                 json.dump(skiped,f)
                 
             return redirect(url_for('show_task'))
@@ -270,14 +322,14 @@ def show_task():
             return render_template('solo leveling.html')
 
     # GET request or after handling POST — show all levels and tasks
-
+    
     levels = None
     tasks = None
     difficultys = None
     resource = None
     if data is None:
-        # flash('No goal selected')
-        return redirect(url_for('new_goal'))
+
+        return render_template('new_goal.html',error='No goal found. Please create a new goal.')
     
     else:
         for lvl in data["levels"]:
@@ -287,8 +339,8 @@ def show_task():
             all_done = all(                     #so this checks if all tasks are completed
                                                 #if any task remain then the if condition fails and it goes 
                 t["task_name"] in completes or  #to the second loop and continue with task showing process
-                t["task_name"] in pending_names or #but if condition id true mean all task is completed for  
-                t["task_name"] in skips             #the level then it shows the question page 
+                t["task_name"] in pending_names or #but if condition is true mean all task is completed for  
+                t["task_name"] in skips            #the level then it shows the question page.
                 for t in lvl_tasks
             )
 
@@ -307,7 +359,7 @@ def show_task():
                     break
             else:
                 if lvl['level_number'] not in question_levels:
-                    if not os.path.exists('question.json'):
+                    if not os.path.exists(f'{folder}/question.json'):
                         api = os.getenv('API_KEY')
                         client = OpenAI(
                             api_key=api,
@@ -329,19 +381,20 @@ def show_task():
                         )
                         content = response.choices[0].message.content
                         datas = json.loads(content)
-                        with open('question.json','w') as f:
+                        with open(f'{folder}/question.json','w') as f:
                             json.dump(datas,f)
                         # current_lvl += 1
-                        return redirect(url_for('show_question'))
+                    return redirect(url_for('show_question'))
                 continue
 
         else:
+            folder = user_folder()
             files = ['complete.txt','skip.txt','question.json','question.txt','level.json']
             remove_file(files)
             return render_template('final.html')
 
         try:
-            with open('xp.txt','r') as f:
+            with open(f'{folder}/xp.txt','r') as f:
                 content = f.read()
         except FileNotFoundError:
             content = '0'
@@ -358,6 +411,7 @@ def show_task():
 
 @backend.route('/question',methods=['GET','POST'])
 def show_question():
+    folder = user_folder()
     answered = answered_question()
     data = dataa()
     completes = complete()
@@ -390,10 +444,10 @@ def show_question():
         )
 
         content = response.choices[0].message.content
-        with open('mark.txt','w') as f:
+        with open(f'{folder}/mark.txt','w') as f:
             f.write(str(content))
 
-        with open('mark.txt','r') as f:
+        with open(f'{folder}/mark.txt','r') as f:
             mark = f.read()
 
 
@@ -417,7 +471,7 @@ def show_question():
                             if t['task_name'] in completes:
                                 completes.remove(t['task_name'])
 
-                        with open('complete.txt', 'w') as f:
+                        with open(f'{folder}/complete.txt', 'w') as f:
                             json.dump(completes,f)
 
                         updated_pending = []
@@ -426,8 +480,8 @@ def show_question():
                         for p in pending:
                             if p['task_name'] not in level_task_name:
                                 updated_pending.append(p)
-                            with open('pending.json', 'w') as f:
-                                json.dump(updated_pending, f)
+                        with open(f'{folder}/pending.json', 'w') as f:
+                            json.dump(updated_pending, f)
 
             file_name = ['answered.txt','question.json','mark.txt']
             remove_file(file_name)
@@ -436,11 +490,11 @@ def show_question():
         
         else:
             answered.append(question)
-            with open('answered.txt', 'w') as f:
+            with open(f'{folder}/answered.txt', 'w') as f:
                 json.dump(answered, f)
             return redirect(url_for('show_question'))
     try:
-        with open('question.json','r') as f:
+        with open(f'{folder}/question.json','r') as f:
             content = json.load(f)
     except:
         return redirect(url_for('home'))
@@ -475,6 +529,7 @@ def show_question():
         
 @backend.route('/pending_task',methods=['GET','POST'])
 def pending_task():
+    folder = user_folder()
     p_s = pending_skip()
     p_c = pending_complete()
 
@@ -492,20 +547,22 @@ def pending_task():
             a = xp_reward
             # clean = ddata.pop(ind)
             try:
-                with open('xp.txt', 'r') as f:
+                with open(f'{folder}/xp.txt', 'r') as f:
                     x = int(f.read())
             except FileNotFoundError:
                 x = 0
             n = x + a
-            print(f'complete: {n}')
-            with open('xp.txt','w') as f:
+            # print(f'complete: {n}')
+
+            with open(f'{folder}/xp.txt','w') as f:
                 f.write(str(n))
-            with open('pending.json','w') as f:
+
+            with open(f'{folder}/pending.json','w') as f:
                 json.dump(ddata,f)
 
             pending = pending_complete()
             pending.append(task_name)
-            with open('pending_complete.txt','w') as f:
+            with open(f'{folder}/pending_complete.txt','w') as f:
                 json.dump(pending,f)
             
             return redirect(url_for('pending_task'))
@@ -513,16 +570,16 @@ def pending_task():
         elif 'no' == action:
             
             c = xp_reward
-            with open('xp.txt', 'r') as f:
+            with open(f'{folder}/xp.txt', 'r') as f:
                 l = int(f.read())
             o = l - c
-            print(f'incomplete: {o}')
-            with open('xp.txt','w') as f:
+
+            with open(f'{folder}/xp.txt','w') as f:
                 f.write(str(o))
 
             pending_skips = pending_skip()
             pending_skips.append(task_name)
-            with open('pending_skip.txt','w') as f:
+            with open(f'{folder}/pending_skip.txt','w') as f:
                 json.dump(pending_skips,f)
 
             return redirect(url_for('pending_task'))
@@ -547,7 +604,7 @@ def pending_task():
     
 
     try:
-        with open('xp.txt','r') as f:
+        with open(f'{folder}/xp.txt','r') as f:
             content = f.read()
     except FileNotFoundError:
         content = '0'
