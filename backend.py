@@ -160,7 +160,7 @@ def login():
         existing = User.query.filter_by(username = username).first()
 
         if not existing or not check_password_hash(existing.password,password):
-            return render_template('login.html', error = 'Invalid credentials')
+            return render_template('login.html', error = 'If you are new user please sign up first or check your username and password')
         
         session['username'] = username
         return redirect(url_for('home'))
@@ -611,3 +611,21 @@ def pending_task():
         content = '0'
     return render_template('pending_task.html',
                            tasks = tasks, content = content)
+
+
+conf.get_default().auth_token='3Ga0kzoko9TRMvUZOzCWgV9iiNz_51DugyUD4sDdCzxrRJFcd'
+
+tunnels = ngrok.get_tunnels()
+print(f'Active tunnels: {tunnels}')
+for tunnel in tunnels:
+    print(f'Closing: {tunnel.public_url}')
+    ngrok.disconnect(tunnel.public_url)
+
+ngrok.kill()
+print('All tunnels closed')
+if __name__ == '__main__':
+    if os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
+        public_url = ngrok.connect(5000)
+        print(f'Open this on your phone: {public_url}')
+    
+    backend.run(debug=True, port=5000)
