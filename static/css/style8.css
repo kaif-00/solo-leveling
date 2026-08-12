@@ -108,6 +108,15 @@
     animation: fadeOut 4s forwards;
 }
 
+@keyframes fadeOut{
+    0%, 40%{
+        opacity: 1;
+    }
+
+    100%{
+        opacity: 0;
+    }
+}
 
 @media (max-width: 480px){
     .solo_leveling{
