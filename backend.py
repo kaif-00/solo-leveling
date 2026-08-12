@@ -14,6 +14,7 @@ backend.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///User.db'
 backend.config['SECRET_KEY'] = 'secretkey'
 db = SQLAlchemy(backend)
 
+
 class User(db.Model):
     id=db.Column(db.Integer,primary_key=True)
     username = db.Column(db.String(35),nullable=False, unique=True)
@@ -84,6 +85,7 @@ def complete():
         return content
     except FileNotFoundError:
         return []
+
 def skip():
         try:
             folder = user_folder()
@@ -92,7 +94,6 @@ def skip():
             return content
         except FileNotFoundError:
             return []
-
 
 def pending_data():
     try:
@@ -327,9 +328,9 @@ def show_task():
     tasks = None
     difficultys = None
     resource = None
-    if data is None:
 
-        return render_template('new_goal.html',error='No goal found. Please create a new goal.')
+    if data is None:
+        return redirect(url_for('new_goal'))
     
     else:
         for lvl in data["levels"]:
@@ -611,6 +612,17 @@ def pending_task():
     return render_template('pending_task.html',
                            tasks = tasks, content = content)
 
+
+conf.get_default().auth_token='3Ga0kzoko9TRMvUZOzCWgV9iiNz_51DugyUD4sDdCzxrRJFcd'
+
+tunnels = ngrok.get_tunnels()
+print(f'Active tunnels: {tunnels}')
+for tunnel in tunnels:
+    print(f'Closing: {tunnel.public_url}')
+    ngrok.disconnect(tunnel.public_url)
+
+ngrok.kill()
+print('All tunnels closed')
 if __name__ == '__main__':
     if os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
         public_url = ngrok.connect(5000)
