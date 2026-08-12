@@ -301,12 +301,10 @@ def show_task():
                     current_xp = int(f.read())
             except FileNotFoundError:
                 current_xp = '0'
-            if current_xp < 20:
+            if int(current_xp) < 20:
                 # re-render with error message
                 data = dataa()
-                return render_template('show_task.html',
-                    levels=data['levels'],
-                    error='Not enough XP to skip. Need 20 XP.')
+                return render_template(url_for('show_task'))
             
             new_xp = current_xp - 20
             with open(f'{folder}/xp.txt', 'w') as f:
