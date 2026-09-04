@@ -182,7 +182,7 @@ def model(prompt):
     )
 
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="openai/gpt-oss-20b",
         messages = [{
             'role':'system',
             'content':"""You are an AI that creates a gamified "Solo Leveling" style progression system.
@@ -366,7 +366,7 @@ def show_task():
                         )
 
                         response = client.chat.completions.create(
-                            model="llama-3.3-70b-versatile",
+                            model="openai/gpt-oss-20b",
                             messages=[{
                                 'role': 'system',
                                 'content': """You generate quiz questions. Output ONLY valid JSON, no markdown.
@@ -433,7 +433,7 @@ def show_question():
         )
 
         response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="openai/gpt-oss-20b",
             messages=[{
                 'role': 'system',
                 'content': f"""Check this answer and give only a mark out of 100, no explanation.NO extra words only mark will be there
@@ -611,19 +611,3 @@ def pending_task():
                            tasks = tasks, content = content)
 
 
-conf.get_default().auth_token='3Ga0kzoko9TRMvUZOzCWgV9iiNz_51DugyUD4sDdCzxrRJFcd'
-
-tunnels = ngrok.get_tunnels()
-print(f'Active tunnels: {tunnels}')
-for tunnel in tunnels:
-    print(f'Closing: {tunnel.public_url}')
-    ngrok.disconnect(tunnel.public_url)
-
-ngrok.kill()
-print('All tunnels closed')
-if __name__ == '__main__':
-    if os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
-        public_url = ngrok.connect(5000)
-        print(f'Open this on your phone: {public_url}')
-    
-    backend.run(debug=True, port=5000)
