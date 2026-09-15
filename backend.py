@@ -212,6 +212,15 @@ def model(prompt):
          - medium: 20 XP
          - hard: 50 XP
 
+        CRITICAL RULES:
+         - Output ONLY raw JSON
+         - NO markdown, NO code fences, NO backticks
+         - NO comments inside JSON
+         - NO explanation before or after
+         - Start your response with { and end with }
+         - STRICT: Any non-JSON character will break the system
+
+         Create exactly 5 levels...
          STRICT: Output must be valid JSON only."""
         },
         {
