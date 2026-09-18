@@ -230,7 +230,14 @@ def model(prompt):
         # temperature=0.2
         )
     content = response.choices[0].message.content
+    content = content.strip()  # Remove leading/trailing whitespace
+    if content.startswith('```'):
+        content = content.split('```')[1]
+        if content.startswith('json'):
+            content = content[4:]
+    content = content.strip()  # Remove leading/trailing whitespace again
 
+    
     data = json.loads(content)
     with open(f'{folder}/level.json','w') as f:
         json.dump(data,f)
